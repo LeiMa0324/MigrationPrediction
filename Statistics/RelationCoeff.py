@@ -87,6 +87,7 @@ def PlaynumPerUserCDF():
         Atotalplaynum.append(t[0])
     #数据排序
     Atotalplaynum.sort()
+
     #计算数据比例 calculate the proportional values of samples，递增+1计数
     p1 = 100. * np.arange(1,len(Atotalplaynum)+1) / (len(Atotalplaynum))
 
