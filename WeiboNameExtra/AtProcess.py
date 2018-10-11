@@ -111,8 +111,8 @@ def acfun_process():
     df_final= delete_punc(df1)
     insert_data(df_final, 'acfun_weibo_at_processed')
 
-
-acfun_process()
+#
+# acfun_process()
 
 '''
 正则test
