@@ -13,7 +13,7 @@ conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset="
 '''
 2、不包含@
 表名：bili_weibo_other
-微博：打老虎
+
 微博id:
 微博【大宅】
 微博->亲爱的撒多
@@ -32,7 +32,12 @@ def get_data(sql):
     df = pd.read_sql(sql=sql,con=conn)
     return df
 
+'''
+处理格式
+微博：打老虎
+微博id：哈哈哈
 
+'''
 # 获取新浪xxx冒号后的姓名，不符合要求的colon_name为空
 def strip_colon(df,column_name):
     df1 = df
@@ -51,6 +56,33 @@ def strip_colon(df,column_name):
     df1['colon_name'] = direct_colon_name
     print(df1)
     return df1
+'''
+处理格式 用空格分割
+微博 小美女
+'''
+
+def delete_blank(df,column_name):
+    df1 = df
+    direct_colon_name = []
+    print('获取空格后的微博名...')
+    for index,row in df1.iterrows():
+        try:
+            signgroup = re.search(r'.*[微博 微博id][\s+](.*)', row[column_name], re.M | re.I)
+            direct_colon_name.append(signgroup.group(1))
+            print(direct_colon_name[index])
+        except Exception:
+            print("unmatch item, next!")
+            direct_colon_name.append(None)
+            pass
+
+    df1['colon_name'] = direct_colon_name
+    print(df1)
+    return df1
+
+
+'''
+处理微博名后面的部分
+'''
 
 # 去除空格
 def strip_blank(df):
@@ -114,6 +146,7 @@ def insert_data(df,table_name):
 '''
 main 函数
 '''
+#  处理用冒号分割的微博名
 def bili_process():
     # process 1
     sql1 = "SELECT id,signature FROM MigrationDetection.acfun_weibo_other;"
@@ -123,14 +156,24 @@ def bili_process():
     df_no_blan_no_punc = strip_punc(df_noblank)
     insert_data(df_no_blan_no_punc,'acfun_weibo_other_processed')
 
+# 处理用空格分割的微博名
+def blank_split():
+    sql1 = "SELECT mid,sign FROM MigrationDetection.bili_weibo_other_nocolon;"
+    df1 = get_data(sql1)
+    # 获取空格后的微博名+其他信息
+    df_name = delete_blank(df1,'sign')
+    # 处理微博名后的空格
+    df_noblank = strip_blank(df_name)
+    # 处理微博名后的标点
+    df_no_blan_no_punc = strip_punc(df_noblank)
+    insert_data(df_no_blan_no_punc, 'bili_weibo_other_nocolon_processed')
 
+# blank_split()
+# bili_process()
 
+line1 ='新浪微博 方向音痴的企鹅。链接：http://pan.baidu.com/s/1XaFy2 密码：iy34请自取。努力追求KAITO中'
+line2 ='微博id 碳化钙_CaC2'
+line3 ='微博 阿奚_喵了个咪   今天也要好好努力呐（·w·）9'
 
-bili_process()
-
-# line1 ='新浪微博：方向音痴的企鹅。链接：http://pan.baidu.com/s/1XaFy2 密码：iy34请自取。努力追求KAITO中'
-# line2 ='微博 碳化钙_CaC2'
-# line3 ='个人新浪微博【Kan岚七】'
-#
-# signgroup = re.search(r'.*[微博 围脖 围脖儿][\s ](.*)', line2, re.M | re.I)
-# print(signgroup.group(1))
+signgroup = re.search(r'.*[微博 微博id][\s+](.*)', line2, re.M | re.I)
+print(signgroup.group(1))
