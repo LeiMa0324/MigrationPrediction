@@ -158,22 +158,23 @@ def bili_process():
 
 # 处理用空格分割的微博名
 def blank_split():
-    sql1 = "SELECT mid,sign FROM MigrationDetection.bili_weibo_other_nocolon;"
+    sql1 = "SELECT id,signature FROM MigrationDetection.acfun_weibo_other_nocolon;"
     df1 = get_data(sql1)
     # 获取空格后的微博名+其他信息
-    df_name = delete_blank(df1,'sign')
+    df_name = delete_blank(df1,'signature')
     # 处理微博名后的空格
     df_noblank = strip_blank(df_name)
     # 处理微博名后的标点
     df_no_blan_no_punc = strip_punc(df_noblank)
-    insert_data(df_no_blan_no_punc, 'bili_weibo_other_nocolon_processed')
+    insert_data(df_no_blan_no_punc, 'acfun_weibo_other_nocolon_processed')
 
-# blank_split()
+blank_split()
+
 # bili_process()
 
-line1 ='新浪微博 方向音痴的企鹅。链接：http://pan.baidu.com/s/1XaFy2 密码：iy34请自取。努力追求KAITO中'
-line2 ='微博id 碳化钙_CaC2'
-line3 ='微博 阿奚_喵了个咪   今天也要好好努力呐（·w·）9'
-
-signgroup = re.search(r'.*[微博 微博id][\s+](.*)', line2, re.M | re.I)
-print(signgroup.group(1))
+# line1 ='新浪微博 方向音痴的企鹅。链接：http://pan.baidu.com/s/1XaFy2 密码：iy34请自取。努力追求KAITO中'
+# line2 ='微博id 碳化钙_CaC2'
+# line3 ='微博 阿奚_喵了个咪   今天也要好好努力呐（·w·）9'
+#
+# signgroup = re.search(r'.*[微博 微博id][\s+](.*)', line2, re.M | re.I)
+# print(signgroup.group(1))
