@@ -1,7 +1,6 @@
 #coding=utf8
 import numpy as np
 from pylab import *
-import scikits.statsmodels as sm
 import pymysql
 import math
 import os
@@ -27,8 +26,8 @@ def PearsonCoeff(db):
 
         cur.execute(sql)
         tuples = cur.fetchall()
-    except Exception,e:
-        print e
+    except Exception:
+        print(Exception)
     finally:
         pass
     playnum = []
@@ -45,8 +44,8 @@ def PearsonCoeff(db):
     #计算皮尔逊系数
     Pearson = np.corrcoef(dataarray)
 
-    print db+"皮尔逊系数矩阵："
-    print Pearson
+    print(db+"皮尔逊系数矩阵：")
+    print(Pearson)
 
 '''
 acfun皮尔逊系数矩阵：
@@ -62,23 +61,23 @@ bilibili_whole皮尔逊系数矩阵：
 '''
 
 '''
-play number per user累计分布图
+播放量累计分布图
 '''
 
 def PlaynumPerUserCDF():
     '''
     A 站数据
     '''
-    conn = pymysql.connect(host="127.0.0.1",user="root",passwd="root",charset="utf8")
+    conn = pymysql.connect(host="223.3.76.172",user="root",passwd="123",charset="utf8")
     tuples=()
     try:
-        conn.select_db("acfun")
+        conn.select_db("bilibili")
         cur = conn.cursor()
-        sql= "select total_playnum from upper_detail;"
+        sql= "select totalplaynum from acfun_playnum;"
         cur.execute(sql)
         tuples = cur.fetchall()
-    except Exception,e:
-        print e
+    except Exception:
+        print(Exception)
     finally:
         conn.close()
     Atotalplaynum=[]
@@ -92,16 +91,16 @@ def PlaynumPerUserCDF():
     p1 = 100. * np.arange(1,len(Atotalplaynum)+1) / (len(Atotalplaynum))
 
     #B站数据
-    conn = pymysql.connect(host="127.0.0.1",user="root",passwd="root",charset="utf8")
+    conn = pymysql.connect(host="223.3.76.172",user="root",passwd="123",charset="utf8")
     tuples=()
     try:
-        conn.select_db("bilibili_whole")
+        conn.select_db("bilibili")
         cur = conn.cursor()
-        sql= "select playnum from upper_detail;"
+        sql= "select playnum from bilibili_uppers_detail;"
         cur.execute(sql)
         tuples = cur.fetchall()
-    except Exception,e:
-        print e
+    except Exception:
+        print(Exception)
     finally:
         conn.close()
     Btotalplaynum=[]
@@ -121,20 +120,19 @@ def PlaynumPerUserCDF():
     #一行二列的图像，选择第一个
     ax1 = fig.add_subplot(1,1,1)
     ax1.semilogx(Atotalplaynum, p1)  # x轴为对数坐标轴
-    ax1.plot(Atotalplaynum,p1,label="acfun")
+    ax1.plot(Atotalplaynum,p1,'-k',label="Acfun")
     ax1.set_ylabel(u'累计百分比%')
 
     # # 一行二列的图像，选择第二个
     ax2 = fig.add_subplot(1,1,1)
     ax2.semilogx(Btotalplaynum, p2)  # x轴为对数坐标轴
-    ax2.plot(Btotalplaynum, p2,color='#008B8B',label="bili")
+    ax2.plot(Btotalplaynum, p2,'k--',label="Bilibili",color ='black')
     ax2.set_xlabel(u'单个用户视频播放量')
     ax2.set_ylabel(u'累计百分比%')
     plt.title(u' Acfun/Bilibili单个用户播放量累计分布图')
 
     plt.legend()
     plt.plot()
-    plt.savefig("PlaynumPerUserCDF.png")
     show()
 
 
@@ -153,8 +151,8 @@ def VideonumPerUserDoubleLog():
         sql= "select videocount from upper_detail;"
         cur.execute(sql)
         tuples = cur.fetchall()
-    except Exception,e:
-        print e
+    except Exception:
+        print(Exception)
     finally:
         conn.close()
     Atotalplaynum=[]
@@ -167,7 +165,7 @@ def VideonumPerUserDoubleLog():
     for a in Atotalplaynum:
         percentage= float(Atotalplaynum.count(a))/float(len(Atotalplaynum))
         p1.append(percentage)
-    print p1
+    print(p1)
 
     #B站数据
     conn = pymysql.connect(host="127.0.0.1",user="root",passwd="root",charset="utf8")
@@ -178,8 +176,8 @@ def VideonumPerUserDoubleLog():
         sql= "select videocount from upper_detail;"
         cur.execute(sql)
         tuples = cur.fetchall()
-    except Exception,e:
-        print e
+    except Exception:
+        print(Exception)
     finally:
         conn.close()
     Btotalplaynum=[]
@@ -193,7 +191,7 @@ def VideonumPerUserDoubleLog():
     for a in Btotalplaynum:
         percentage= float(Btotalplaynum.count(a))/float(len(Btotalplaynum))
         p2.append(percentage)
-    print p2
+    print(p2)
 
     # plot the sorted data:
     #创建一个空figure
