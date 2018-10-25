@@ -117,22 +117,19 @@ def PlaynumPerUserCDF():
     # plot the sorted data:
     #创建一个空figure
     fig = figure()
-    #一行二列的图像，选择第一个
-    ax1 = fig.add_subplot(1,1,1)
-    ax1.semilogx(Atotalplaynum, p1)  # x轴为对数坐标轴
-    ax1.plot(Atotalplaynum,p1,'-k',label="Acfun")
-    ax1.set_ylabel(u'累计百分比%')
 
-    # # 一行二列的图像，选择第二个
-    ax2 = fig.add_subplot(1,1,1)
-    ax2.semilogx(Btotalplaynum, p2)  # x轴为对数坐标轴
-    ax2.plot(Btotalplaynum, p2,'k--',label="Bilibili",color ='black')
-    ax2.set_xlabel(u'单个用户视频播放量')
-    ax2.set_ylabel(u'累计百分比%')
+    plt.semilogx(Atotalplaynum, p1,'-',label='Acfun',color='k')  # x轴为对数坐标轴
+
+
+    plt.semilogx(Btotalplaynum, p2,'--',label ='Bilibili',color='k')  # x轴为对数坐标轴
+
+
+
+    plt.xlabel(u'单个用户视频播放量')
+    plt.ylabel(u'累计百分比%')
     plt.title(u' Acfun/Bilibili单个用户播放量累计分布图')
-
+    plt.savefig(u'PlaynumPerUserCDF.png')
     plt.legend()
-    plt.plot()
     show()
 
 
