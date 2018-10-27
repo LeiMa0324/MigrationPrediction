@@ -4,7 +4,9 @@ from pylab import *
 import pymysql
 import math
 import os
+# 正常显示中文
 mpl.rcParams['font.sans-serif'] =['SimHei']
+# 正常显示负号
 mpl.rcParams['axes.unicode_minus'] = False
 
 '''
@@ -140,12 +142,12 @@ def VideonumPerUserDoubleLog():
     '''
     A 站数据
     '''
-    conn = pymysql.connect(host="127.0.0.1",user="root",passwd="root",charset="utf8")
+    conn = pymysql.connect(host="223.3.76.172",user="root",passwd="123",charset="utf8")
     tuples=()
     try:
-        conn.select_db("acfun")
+        conn.select_db("bilibili")
         cur = conn.cursor()
-        sql= "select videocount from upper_detail;"
+        sql= "select videocount from acfun_uppers_detail;"
         cur.execute(sql)
         tuples = cur.fetchall()
     except Exception:
@@ -165,12 +167,12 @@ def VideonumPerUserDoubleLog():
     print(p1)
 
     #B站数据
-    conn = pymysql.connect(host="127.0.0.1",user="root",passwd="root",charset="utf8")
+    conn = pymysql.connect(host="223.3.76.172",user="root",passwd="123",charset="utf8")
     tuples=()
     try:
-        conn.select_db("bilibili_whole")
+        conn.select_db("bilibili")
         cur = conn.cursor()
-        sql= "select videocount from upper_detail;"
+        sql= "select videocount from bili_video_count;"
         cur.execute(sql)
         tuples = cur.fetchall()
     except Exception:
