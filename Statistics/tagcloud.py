@@ -27,15 +27,15 @@ def tagcloud():
         cur.execute(sql)
         tuples = list(cur.fetchall())
         tuples.pop(0)
-    except Exception,e:
-        print e
+    except Exception:
+        print(Exception)
     finally:
         conn.close()
     for t in tuples:
         wordcounts.append((t[0],int(t[1])))
-    print wordcounts
+    print(wordcounts)
     tags = pytagcloud.make_tags(wordcounts,minsize=30,maxsize=240,colors=random.choice(COLOR_SCHEMES.values()))
-    print tags
+    print(tags)
     pytagcloud.create_tag_image(tags, 'bili_tag_cloud.png', size=(2400, 1000),background=(0, 0, 0, 255),layout=LAYOUT_HORIZONTAL,fontname="SimHei")
 
 tagcloud()
