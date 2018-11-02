@@ -46,7 +46,7 @@ def usermapping():
         cur.execute(sql)
         record = cur.fetchall()
         #获取唯一的(aid,bid)
-        usermapping = set(record)
+        usermapping =list(set(record))
         cur.close()
         conn.close()
         print(len(usermapping))
@@ -62,24 +62,65 @@ def usermapping():
               'b.mid as b_id,b.name as b_name,b.sex as b_sex,b.sign as b_sign'\
               ' FROM bilibili.acfun_uppers_detail as a, bilibili_uppers_detail as b' \
               ' where a.id=%s and b.mid=%s;'
+
+        # csv写入列名
+        column_name='a_id,a_username,a_gender,a_sign,b_id,b_name,b_sex,b_sign'
+
+        with open('UsermappingByVideo.csv', 'a', newline='', encoding='utf-8') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(column_name)
+
         for row in usermapping:
+            print("写入第%d行"%usermapping.index(row) )
+            print("aid:%s bid:%s"%(row[0],row[1]))
             cur = conn.cursor()
-            print(sql)
             cur.execute(sql,(row[0],row[1]))
             row = cur.fetchone()
-            usermapping_detail.append(row)
-            with open('UsermappingByVideo.csv', 'a', newline='',encoding='utf-8') as csvfile:
-                writer = csv.writer(csvfile)
-                writer.writerow(row)
+            if row:
+                usermapping_detail.append(row)
+                with open('UsermappingByVideo.csv', 'a', newline='',encoding='utf-8') as csvfile:
+                    writer = csv.writer(csvfile)
+                    writer.writerow(row)
+            else:
+                continue
 
     except Exception:
         print(traceback.print_exc())
 
-    print(len(usermapping_detail))
+# 记录Video数
+def CommonVideoCount():
+    usermapping=[]
+    try:
+        conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset="utf8", db='bilibili')
+        sql = 'SELECT a_id,b_id FROM bilibili.UsermappingByVideo;'
+        cur = conn.cursor()
+        cur.execute(sql)
+        record = cur.fetchall()
+        usermapping = list(record)
+        cur.close()
+        conn.close()
 
-    usermapping_detail_DF = pd.read_csv('UsermappingByVideo.csv')
-    usermapping_detail_DF.columns=['a_id','a_username','a_gender','a_sig','b_id','b_name','b_sex','b_sign']
-    engine = create_engine('mysql+pymysql://root:123@223.3.76.172/MigrationDetection?charset=utf8')
-    usermapping_detail_DF.to_sql(name='UsermappingByVideo',if_exists='replace',con=engine)
+    except Exception:
+        print(traceback.print_exc())
 
-usermapping()
+    for row in usermapping:
+        tmp_sql ='SELECT count(*) from video_mapping where a_uid =%s and mid =%s;'
+        try:
+            conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset="utf8", db='bilibili')
+            cur = conn.cursor()
+            cur.execute(tmp_sql,(row[0],row[1]))
+            record = cur.fetchone()
+            cur.close()
+            if record:
+                cur1= conn.cursor()
+                update_sql = 'update UsermappingByVideo set common_videos=%s where a_id=%s and b_id =%s;'
+                cur1.execute(update_sql,(record[0],row[0],row[1]))
+                print('完成update：aid：%s,b_id%s,common_video:%d'%(row[0],row[1],record[0]))
+                cur1.close()
+            conn.commit()
+            conn.close()
+
+        except Exception:
+            print(traceback.print_exc())
+
+CommonVideoCount()
