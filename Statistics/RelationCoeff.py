@@ -2,12 +2,23 @@
 import numpy as np
 from pylab import *
 import pymysql
+from matplotlib import pyplot as plt
+
+from matplotlib.font_manager import FontProperties  # 步骤一
 import math
 import os
-# 正常显示中文
-mpl.rcParams['font.sans-serif'] =['SimHei']
-# 正常显示负号
-mpl.rcParams['axes.unicode_minus'] = False
+
+#正常显示中文
+# plt.rcParams['font.sans-serif'] =['SimHei']
+font = FontProperties(fname='C:\Windows\Fonts\SimHei.ttf')
+plt.rcParams['axes.unicode_minus'] = False
+#正常显示负号
+
+
+
+
+
+
 
 '''
 计算皮尔逊系数
@@ -64,6 +75,7 @@ bilibili_whole皮尔逊系数矩阵：
 
 '''
 播放量累计分布图
+图3.3
 '''
 
 def PlaynumPerUserCDF():
@@ -136,7 +148,7 @@ def PlaynumPerUserCDF():
 
 
 '''
-用户视频数量-频率双对数图
+第三章 图3.2用户视频数量-频率双对数图
 '''
 def VideonumPerUserDoubleLog():
     '''
@@ -217,9 +229,53 @@ def VideonumPerUserDoubleLog():
     ax2.scatter(Btotalplaynum, p2, s=10, color='black')
     plt.show()
 
-#
-# PearsonCoeff("acfun")
-# PearsonCoeff("bilibili_whole")
-# VideonumPerUserDoubleLog()
-PlaynumPerUserCDF()
 
+
+'''
+第四章 图4.4 common video-频率双对数图
+'''
+def CommonVideoDoubleLog():
+    '''
+    A 站数据
+    '''
+    conn = pymysql.connect(host="223.3.76.172",user="root",passwd="123",charset="utf8")
+    tuples=()
+    try:
+        conn.select_db("MigrationDetection01")
+        cur = conn.cursor()
+        sql= "SELECT common_videos FROM MigrationDetection01.UsermappingByVideo; "
+        cur.execute(sql)
+        tuples = cur.fetchall()
+    except Exception:
+        print(Exception)
+    finally:
+        conn.close()
+    Atotalplaynum=[]
+    for t in tuples:
+        Atotalplaynum.append(t[0])
+    #数据排序
+    Atotalplaynum.sort()
+    #计算数据所占比例,存储某个数字在list中出现个数的字典
+    p1 = []
+    for a in Atotalplaynum:
+        percentage= float(Atotalplaynum.count(a))/float(len(Atotalplaynum))
+        p1.append(percentage)
+    print(p1)
+
+
+    # plot the sorted data:
+    #创建一个空figure
+    fig = figure()
+    #一行二列的图像，选择第一个
+    plt.xlabel(u'Acfun-Bilibili两用户之间相同视频数',fontproperties =font)
+    plt.ylabel(u'频率',fontproperties ="SimHei")
+    plt.title(u' Acfun-Bilibili用户相同视频数量-频率双对数图',fontproperties ="SimHei")
+    # ax1.semilogx(x, y)  # x轴为对数坐标轴
+    # ax1.semilogy(x, y)  # y轴为对数坐标轴
+    #
+    plt.loglog(Atotalplaynum, p1, linewidth=0)  # 双对数坐标轴
+    plt.scatter(Atotalplaynum, p1, s=10, color='black')
+
+    plt.show()
+
+CommonVideoDoubleLog()
