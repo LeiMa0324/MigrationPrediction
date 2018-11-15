@@ -41,7 +41,7 @@ def usermapping():
     usermapping=()
     try:
         conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset="utf8", db='bilibili')
-        sql = 'SELECT a_uid,mid FROM bilibili.video_mapping;'
+        sql = 'SELECT a_uid,b_uid FROM MigrationDetection01.video_mapping_new group by a_uid,b_uid;'
         cur = conn.cursor()
         cur.execute(sql)
         record = cur.fetchall()
@@ -87,7 +87,7 @@ def usermapping():
     except Exception:
         print(traceback.print_exc())
 
-# 记录Video数
+# 记录共有Video数
 def CommonVideoCount():
     usermapping=[]
     try:
@@ -104,7 +104,7 @@ def CommonVideoCount():
         print(traceback.print_exc())
 
     for row in usermapping:
-        tmp_sql ='SELECT count(*) from video_mapping where a_uid =%s and mid =%s;'
+        tmp_sql ='SELECT count(*) from video_mapping where a_uid =%s and mid =%s group by a_vid;'
         try:
             conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset="utf8", db='bilibili')
             cur = conn.cursor()
@@ -113,7 +113,7 @@ def CommonVideoCount():
             cur.close()
             if record:
                 cur1= conn.cursor()
-                update_sql = 'update UsermappingByVideo set common_videos=%s where a_id=%s and b_id =%s;'
+                update_sql = 'update UsermappingByVideo set common_videos=%s where a_id=%s and b_id =%s '
                 cur1.execute(update_sql,(record[0],row[0],row[1]))
                 print('完成update：aid：%s,b_id%s,common_video:%d'%(row[0],row[1],record[0]))
                 cur1.close()
@@ -123,4 +123,4 @@ def CommonVideoCount():
         except Exception:
             print(traceback.print_exc())
 
-CommonVideoCount()
+usermapping()

@@ -29,16 +29,16 @@ network.grid(column=1, row=1,padx=20,pady=30,ipadx=20)
 
 #----------------------------UI区-----------------------------
 
-ttk.Label(similarity, text=u"选择您需要预测的重叠用户的acfun用户ID:").grid(column=0, row=0,padx=10,pady=10, sticky=tk.W)
+ttk.Label(similarity, text=u"选择acfun用户ID:").grid(column=0, row=0,padx=10,pady=5, sticky=tk.W)
 number = tk.IntVar()
 numberChosen = ttk.Combobox(similarity, width=20, textvariable=number,state='readonly') #3
-numberChosen['values'] = '456194'
-numberChosen.grid(column=1, row=0,padx=10,sticky=tk.W)
+numberChosen['values'] = '414992'
+numberChosen.grid(column=1, row=0,sticky=tk.W)
 numberChosen.current(0)
 
 ttk.Button(similarity, text = u"查看用户信息",
            command = lambda : getUser(numberChosen.get())
-           ).grid(column =1,row =0, padx=180,pady=10,sticky=tk.W
+           ).grid(column =0,row =1,padx=10,pady=5,sticky=tk.W
            )
 
 
@@ -168,34 +168,37 @@ ttk.Label(similarity, text='').grid(column=0, row=16,padx=20, sticky=tk.W)
 combVar = tk.IntVar()
 combVar.set(99)
 
+
+# 预测的迁移概率
+ttk.Label(network, text='').grid(column=0, row=0, sticky=tk.W)
+ttk.Label(network, text='').grid(column=0, row=1, sticky=tk.W)
+ttk.Label(network, text='选择预测模型').grid(column=0, row=2, padx=10,sticky=tk.W)
+tk.Radiobutton(network, text='MGML', variable=combVar, value=0).grid(column=0, row=3, sticky=tk.W)
+tk.Radiobutton(network, text='MGBSC', variable=combVar, value=1).grid(column=0, row=4, sticky=tk.W)
+tk.Radiobutton(network, text='MGLSD', variable=combVar, value=2).grid(column=0, row=5, sticky=tk.W)
+
 ttk.Button(network, text = u"开始预测",
            command = lambda : getUser(numberChosen.get())
-           ).grid(row = 0, column = 0,padx=20, pady=20,sticky=tk.W
-           )
+           ).grid(row = 6, column = 0,padx=10, pady=10,sticky=tk.E)
 
 MigProbVar = tk.StringVar()
 MigProbVar.set('0.78')
 MigDirectVar = tk.StringVar()
 MigDirectVar.set('Acfun->Bilibili')
 
-# 预测的迁移概率
-ttk.Label(network, text='').grid(column=0, row=0, sticky=tk.W)
-ttk.Label(network, text='').grid(column=0, row=1, sticky=tk.W)
-ttk.Label(network, text='').grid(column=0, row=2, sticky=tk.W)
-ttk.Label(network, text='').grid(column=0, row=3, sticky=tk.W)
-ttk.Label(network, text='').grid(column=1, row=4, sticky=tk.W)
-ttk.Label(network, text="迁移概率").grid(column=0, row=5, padx=20,sticky=tk.W)
-ttk.Label(network, textvariable=MigProbVar).grid(column=1, row=5, sticky=tk.W)
-
-ttk.Label(network, text="迁移方向").grid(column=0, row=6, padx=20,sticky=tk.W)
-ttk.Label(network, textvariable=MigDirectVar).grid(column=1, row=6, sticky=tk.W)
-
-ttk.Label(network, text='').grid(column=1, row=7, sticky=tk.W)
-ttk.Label(network, text='').grid(column=1, row=8, sticky=tk.W)
-ttk.Label(network, text='').grid(column=1, row=9, sticky=tk.W)
-ttk.Label(network, text='').grid(column=1, row=10, sticky=tk.W)
-ttk.Label(network, text='').grid(column=1, row=11, sticky=tk.W)
-ttk.Label(network, text='').grid(column=1, row=12, sticky=tk.W)
+ttk.Label(network, text='').grid(column=0, row=7, sticky=tk.W)
+ttk.Label(network, text='').grid(column=0, row=8, sticky=tk.W)
+ttk.Label(network, text="迁移概率").grid(column=0, row=9, padx=20,sticky=tk.W)
+ttk.Label(network, textvariable=MigProbVar).grid(column=1, row=9, sticky=tk.W)
+ttk.Label(network, text="迁移方向").grid(column=0, row=10, padx=20,sticky=tk.W)
+ttk.Label(network, textvariable=MigDirectVar).grid(column=1, row=10, sticky=tk.W)
+ttk.Label(network, text='').grid(column=0, row=11, sticky=tk.W)
+ttk.Label(network, text='').grid(column=0, row=12, sticky=tk.W)
+ttk.Label(network, text='').grid(column=0, row=13, sticky=tk.W)
+ttk.Label(network, text='').grid(column=0, row=14, sticky=tk.W)
+ttk.Label(network, text='').grid(column=1, row=15, sticky=tk.W)
+ttk.Label(network, text='').grid(column=1, row=16, sticky=tk.W)
+ttk.Label(network, text='').grid(column=1, row=17, sticky=tk.W)
 
 # ttk.Label(network, text=u"参数设置").grid(column=0, row=0, pady=10,sticky=tk.W)
 # ttk.Label(network, text=u"组合方式:").grid(column=0, row=1, pady=15,sticky=tk.W)
