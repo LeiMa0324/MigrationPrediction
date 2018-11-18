@@ -2,13 +2,7 @@ import requests
 import json
 import random
 import pymysql
-import videotest
-from multiprocessing.dummy import Pool as ThreadPool
-import sys
-import datetime
 import time
-from imp import reload
-import traceback,sys
 from requests.exceptions import ProxyError
 
 # def datetime_to_timestamp_in_milliseconds(d):
@@ -151,7 +145,7 @@ def insertuser(userlist):
     conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset='utf8')
     # try:
     cur = conn.cursor()
-    conn.select_db("bilibili")
+    conn.select_db("MigrationDetection01")
     #检查是否该用户已存在
     print(userlist[0])
     # sql ='select count(*) from bili_user_addup where mid=%s;'
@@ -174,8 +168,8 @@ def insertuser(userlist):
     conn.close()
 
 # 主程序
-conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset='utf8',db='bilibili')
-sql = "SELECT b_id FROM bilibili.neighbour where b_id!='NULL'";
+conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset='utf8',db='MigrationDetection01')
+sql = 'SELECT mid FROM MigrationDetection01.bilibili_video as b where b.id is null group by mid;'
 cur = conn.cursor()
 cur.execute(sql)
 record = cur.fetchall()

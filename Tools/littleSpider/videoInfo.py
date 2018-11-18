@@ -100,7 +100,7 @@ def InsertTagsandVideo2DB(VideoListlocal):
 
     try:
         cur = conn.cursor()
-        conn.select_db("bilibili")
+        conn.select_db("MigrationDetection01")
         #插入视频数据
         sql="INSERT INTO bili_video_addup(aid, comment,copyright,created,favourites,length,mid,play,review,title,typeid,video_review) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
         tmp=[]
@@ -121,12 +121,13 @@ def InsertTagsandVideo2DB(VideoListlocal):
         conn.close()
 
 
-# 主程序
-conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset='utf8',db='bilibili')
-sql = "SELECT b_id FROM bilibili.neighbour where b_id!='NULL'";
+#主程序
+conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset='utf8',db='MigrationDetection01')
+sql = "SELECT mid FROM MigrationDetection01.bili_user_addup;"
 cur = conn.cursor()
 cur.execute(sql)
 record = cur.fetchall()
 for r in record:
     GetVideoSource(r)
+
 
