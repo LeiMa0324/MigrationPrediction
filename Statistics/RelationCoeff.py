@@ -9,8 +9,10 @@ import math
 import os
 
 #正常显示中文
-
-font = FontProperties(fname='C:\Windows\Fonts\SimHei.ttf')
+# windows
+# font = FontProperties(fname='C:\Windows\Fonts\SimHei.ttf')
+# mac
+font = FontProperties(fname='/Library/Fonts/Songti.ttc')
 #正常显示负号
 plt.rcParams['axes.unicode_minus'] = False
 
@@ -243,6 +245,42 @@ def CommonVideoDoubleLog():
     plt.show()
 
 '''
+第四章 图4.5 相同视频数累计分布图
+'''
+def CommonVideoCDF():
+    '''
+    A 站数据
+    '''
+    conn = pymysql.connect(host="223.3.76.172",user="root",passwd="123",charset="utf8")
+    tuples=()
+    try:
+        conn.select_db("MigrationDetection01")
+        cur = conn.cursor()
+        sql= "select common_videos from UsermappingByVideo where common_videos>1;"
+        cur.execute(sql)
+        tuples = cur.fetchall()
+    except Exception:
+        print(Exception)
+    finally:
+        conn.close()
+    Atotalplaynum=[]
+    for t in tuples:
+        Atotalplaynum.append(t[0])
+    #数据排序
+    Atotalplaynum.sort()
+    print(Atotalplaynum)
+
+    #计算数据比例 calculate the proportional values of samples，递增+1计数
+    p1 = 100. * np.arange(1,len(Atotalplaynum)+1) / (len(Atotalplaynum))
+
+    plt.semilogx(Atotalplaynum, p1,'-',label='Acfun',color='k')  # x轴为对数坐标轴
+    plt.xlabel(u'相同视频数',fontproperties =font)
+    plt.ylabel(u'累计百分比%',fontproperties =font)
+    plt.title(u' Acfun/Bilibili用户相同视频数累计分布图',fontproperties =font)
+    plt.savefig(u'CommonVideoCDF.png')
+    show()
+
+'''
 第四章 图4.6 比例散点图
 '''
 def percentScatter():
@@ -252,7 +290,7 @@ def percentScatter():
     try:
         conn.select_db("MigrationDetection01")
         cur = conn.cursor()
-        sql= "SELECT common_percent_a,common_percent_b,found FROM MigrationDetection01.UsermappingByVideo; "
+        sql= "SELECT a_percent,b_percent,found FROM MigrationDetection01.UsermappingByVideo; "
         cur.execute(sql)
         records = cur.fetchall()
     except Exception:
@@ -274,4 +312,4 @@ def percentScatter():
     plt.scatter(percent_a,percent_b,s=20,c=label)
     plt.show()
 
-percentScatter()
+CommonVideoCDF()
