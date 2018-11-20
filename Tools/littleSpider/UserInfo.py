@@ -169,7 +169,7 @@ def insertuser(userlist):
 
 # 主程序
 conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset='utf8',db='MigrationDetection01')
-sql = 'SELECT mid FROM MigrationDetection01.bilibili_video as b where b.id is null group by mid;'
+sql = 'SELECT b_id FROM MigrationDetection01.overlapping_final where b_videos is null;'
 cur = conn.cursor()
 cur.execute(sql)
 record = cur.fetchall()

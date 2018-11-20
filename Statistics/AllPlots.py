@@ -10,9 +10,9 @@ import os
 
 #正常显示中文
 # windows
-# font = FontProperties(fname='C:\Windows\Fonts\SimHei.ttf')
+font = FontProperties(fname='C:\Windows\Fonts\SimHei.ttf')
 # mac
-font = FontProperties(fname='/Library/Fonts/Songti.ttc')
+# font = FontProperties(fname='/Library/Fonts/Songti.ttc')
 #正常显示负号
 plt.rcParams['axes.unicode_minus'] = False
 
@@ -312,4 +312,89 @@ def percentScatter():
     plt.scatter(percent_a,percent_b,s=20,c=label)
     plt.show()
 
-CommonVideoCDF()
+
+
+'''
+第四章 图4.7 Levenshtein散点图
+'''
+# 计算Levenshtein距离
+def LevenshteinDistStastic():
+    conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset="utf8")
+    records=()
+    LevenDist =[]
+    try:
+        conn.select_db("MigrationDetection01")
+        cur = conn.cursor()
+        sql = "SELECT LevenDist FROM MigrationDetection01.UsermappingByVideo order by common_videos desc limit 250;"
+        cur.execute(sql)
+        records = cur.fetchall()
+    except Exception:
+        print(Exception)
+    finally:
+        conn.close()
+
+    LevenDist =[]
+
+    # 对每一个levendist计数
+    for r in records:
+        LevenDist.append(r[0])
+
+    LevenDist.sort()
+    count =[]
+    label = []
+    for Leven in LevenDist:
+        count.append(LevenDist.count(Leven))
+
+
+    # 绘制散点图
+    plt.xlabel(u'Acfun-Bilibili用户名Levenshtein比例',fontproperties =font)
+    plt.ylabel(u'出现次数',fontproperties =font)
+    plt.title(u' ',fontproperties =font)
+    plt.scatter(LevenDist,count,s=20)
+    plt.show()
+
+
+'''
+第四章 图4.8 A/B上传视频散点图
+'''
+# 计算Levenshtein距离
+def VideosComparasion():
+    conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset="utf8")
+    records=()
+    LevenDist =[]
+    try:
+        conn.select_db("MigrationDetection01")
+        cur = conn.cursor()
+        sql = "SELECT a_videos,b_videos FROM MigrationDetection01.overlapping_final order by a_videos;"
+        cur.execute(sql)
+        records = cur.fetchall()
+    except Exception:
+        print(Exception)
+    finally:
+        conn.close()
+
+    a_videos = []
+    b_videos = []
+
+
+    for r in records:
+        a_videos.append(r[0])
+        b_videos.append(r[1])
+
+
+
+    # 绘制散点图
+    plt.xlabel(u'重叠用户编号',fontproperties =font)
+    plt.ylabel(u'用户上传视频数量',fontproperties =font)
+    plt.title(u' ',fontproperties =font)
+    # PPT用图
+    # plt.scatter(range(1,len(a_videos)+1),a_videos,s=10,alpha=0.5,label='Acfun')
+    # plt.scatter(range(1,len(a_videos)+1),b_videos,s=10,alpha=0.5,label ='Bilibili')
+    # 论文用图
+    plt.scatter(range(1,len(a_videos)+1),a_videos,s=15,marker='*',label='Acfun',c='',edgecolors='k')
+    plt.scatter(range(1,len(a_videos)+1),b_videos,s=10,marker='o',label ='Bilibili',c='',edgecolors='k')
+    plt.legend(loc=2)
+    plt.show()
+
+
+VideosComparasion()

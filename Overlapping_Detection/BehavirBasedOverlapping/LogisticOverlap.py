@@ -2,8 +2,14 @@ from sklearn.linear_model import LogisticRegression
 from sklearn import datasets
 import pymysql
 import numpy as np
+import Levenshtein
+import difflib
+from matplotlib import pyplot as plt
+from matplotlib.font_manager import FontProperties  # 步骤一
+import re
+import csv
 
-
+font = FontProperties(fname='C:\Windows\Fonts\SimHei.ttf')
 '''
 学习common_percent_a和common_percent_b对于重叠用户的模型
 使用logistic
@@ -66,4 +72,141 @@ def LogisticModel(records):
     # # 返回R^2 COEFFICIENT OF DETERMINATION 决定系数
     # print(model.score(data_X, data_y))
 
-LogisticModel()
+
+# 计算Levenshtein距离
+def LevenshteinDist():
+    conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset="utf8")
+    records = ()
+    try:
+        conn.select_db("MigrationDetection01")
+        cur = conn.cursor()
+        sql = "SELECT a_username,b_name FROM MigrationDetection01.UsermappingByVideo;"
+        cur.execute(sql)
+        records = cur.fetchall()
+    except Exception:
+        print(Exception)
+    finally:
+        conn.close()
+
+
+    for row in records:
+        # 4.计算莱文斯坦比
+        # 计算公式  r = (sum - ldist) / sum, 其中sum是指str1 和 str2 字串的长度总和，ldist是 类编辑距离
+        sim = Levenshtein.ratio(row[0], row[1])
+        print(row[0],row[1])
+        print('Levenshtein.ratio similarity: ', sim)
+        newrow = [sim,row[0],row[1]]
+        conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset="utf8")
+        try:
+            conn.select_db("MigrationDetection01")
+            cur = conn.cursor()
+            sql = "update MigrationDetection01.UsermappingByVideo set LevenDist =%f "%sim
+            sql += 'where a_username=%s and b_name=%s;'
+
+            cur.execute(sql,(row[0],row[1]))
+
+        except Exception:
+            print(Exception)
+        finally:
+            conn.commit()
+            conn.close()
+
+
+
+
+# 合并三张表，找出最后的重叠用户
+def OverlappingFinal():
+
+    overlapping = []
+
+    conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset="utf8")
+    records= ()
+    try:
+        conn.select_db("MigrationDetection01")
+        cur = conn.cursor()
+        sql = "SELECT a_id,b_id,weibo_id,weibo_name,weibo_realm FROM MigrationDetection01.overlapping_final01;"
+        cur.execute(sql)
+        records = cur.fetchall()
+    except Exception:
+        print(Exception)
+    finally:
+        conn.close()
+
+    for row in records:
+        new_row = list(row)
+        if new_row not in overlapping:
+            overlapping.append(new_row)
+
+    print(overlapping)
+    print(len(overlapping))
+
+    conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset="utf8")
+    try:
+        conn.select_db("MigrationDetection01")
+        cur = conn.cursor()
+        sql = "insert into overlapping_final02(a_id,b_id,weibo_id,weibo_name,weibo_realm) values(%s,%s,%s,%s,%s);"
+        cur.executemany(sql,overlapping)
+        conn.commit()
+    except Exception:
+        print(Exception)
+
+    finally:
+        conn.close()
+
+
+
+overlapping = []
+
+conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset="utf8")
+records= ()
+try:
+    conn.select_db("MigrationDetection01")
+    cur = conn.cursor()
+    sql = "SELECT b_id FROM MigrationDetection01.overlapping_final  where b_videos is null;"
+    cur.execute(sql)
+    records = cur.fetchall()
+except Exception:
+    print(Exception)
+finally:
+    conn.close()
+
+for row in records:
+    new_row = list(row)
+    overlapping.append(new_row)
+print(overlapping)
+
+videocount  =[]
+conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset="utf8")
+try:
+    conn.select_db("MigrationDetection01")
+    cur = conn.cursor()
+    sql = "SELECT mid,count(*) FROM MigrationDetection01.bili_video_addup where mid =%s;"
+    for user in overlapping:
+        cur.execute(sql,user)
+        count = cur.fetchone()
+        if count[0] !=None:
+            videocount.append(list(count))
+
+
+except Exception:
+    print(Exception)
+
+finally:
+    conn.close()
+
+print(videocount)
+
+conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset="utf8")
+try:
+    conn.select_db("MigrationDetection01")
+    cur = conn.cursor()
+    sql = "update overlapping_final set b_videos = %s where b_id =%s;"
+    for i in videocount:
+        cur.execute(sql,(i[1],i[0]))
+
+    conn.commit()
+except Exception:
+    print(Exception)
+
+finally:
+    conn.close()
