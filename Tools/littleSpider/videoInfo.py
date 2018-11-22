@@ -122,12 +122,12 @@ def InsertTagsandVideo2DB(VideoListlocal):
 
 
 #主程序
-conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset='utf8',db='MigrationDetection01')
-sql = "SELECT b_id FROM MigrationDetection01.overlapping_final where b_videos is null;"
-cur = conn.cursor()
-cur.execute(sql)
-record = cur.fetchall()
-for r in record:
-    GetVideoSource(r)
+# conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset='utf8',db='MigrationDetection01')
+# sql = "SELECT b_id FROM MigrationDetection01.overlapping_final where b_videos is null;"
+# cur = conn.cursor()
+# cur.execute(sql)
+# record = cur.fetchall()
+# for r in record:
+GetVideoSource('92232')
 
 
