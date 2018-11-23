@@ -405,7 +405,7 @@ def TimeDiffHist():
     try:
         conn.select_db("MigrationDetection01")
         cur = conn.cursor()
-        sql = 'SELECT time_diff FROM MigrationDetection01.synthetic_videos01;'
+        sql = 'SELECT time_diff FROM MigrationDetection01.synthetic_videos;'
         cur.execute(sql)
         records = cur.fetchall()
         for r in records:
@@ -428,14 +428,14 @@ def TimeDiffHist():
     alpha:透明度
     """
     print(data)
-    plt.hist(data,bins =6,range=(-2,21),normed= True,facecolor='gray', edgecolor="black",label='频率',alpha=0.5,
+    plt.hist(data,range=(-2,10),facecolor='steelblue', edgecolor="black",label='频数',alpha=0.5,
              )
     # 显示横轴标签
-    plt.xlabel("时间差间隔/天",fontproperties =font)
+    plt.xlabel("用户在Acfun和Bilibili发布同一视频的时间差/天",fontproperties =font)
     # 显示纵轴标签
     plt.ylabel("频数",fontproperties =font)
     # 显示图标题
-    plt.title("同一视频在Acfun和Bilibili的上传时间差频率图",fontproperties =font)
+    # plt.title("同一视频在Acfun和Bilibili的上传时间差频数图",fontproperties =font)
     plt.grid(True)
     plt.legend(prop =font)
     plt.show()
