@@ -9,7 +9,9 @@ import csv
 import  datetime
 import traceback
 
-
+'''
+处理用户发布视频，按照时间顺序
+'''
 def getTimeStamp(date):
 
     return datetime.datetime.strptime(date,'%Y-%m-%d %H:%M').timestamp()
