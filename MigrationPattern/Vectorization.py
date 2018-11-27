@@ -186,4 +186,49 @@ def vector():
             writer = csv.writer(csvfile)
             writer.writerow(biliVector)
 
-vector()
+
+def vector01():
+    UserPairs = getUserPairs()
+    # 对于每一对重叠用户
+    for pair in UserPairs:
+        Series =[]
+        Vector = []
+        Vector.extend(pair)
+
+        conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset="utf8")
+        try:
+            conn.select_db("MigrationDetection02")
+            cur = conn.cursor()
+            sql = "SELECT vec_element FROM MigrationDetection02.overlap_vectors where a_id=%s and b_id=%s;"
+            cur.execute(sql,pair)
+            records = cur.fetchall()
+            for row in records:
+                Series.append(row[0])
+        except Exception as err:
+            print(err)
+            print(traceback.print_exc())
+        finally:
+            conn.close()
+
+        print(Series)
+        # 对每一个标记
+        for s in Series:
+            # 标签为‘A’，ac向量记1，bili记0
+            if s =='A':
+                Vector.append([1,0])
+
+            else:
+                # 标签为‘B’，ac向量记0，bili记1
+                if s=='B':
+                    Vector.append([0, 1])
+
+                    # 标签为'AB',同时记1
+                else:
+                    Vector.append([1, 1])
+
+
+        with open('vector.csv', 'a', newline='', encoding='utf-8') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(Vector)
+
+vector01()
