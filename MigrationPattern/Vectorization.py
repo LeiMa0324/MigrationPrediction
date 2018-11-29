@@ -220,11 +220,11 @@ def vector01():
             else:
                 # 标签为‘B’，ac向量记0，bili记1
                 if s=='B':
-                    Vector.append([0, 1])
+                    Vector.append([0,1])
 
                     # 标签为'AB',同时记1
                 else:
-                    Vector.append([1, 1])
+                    Vector.append([1,1])
 
 
         with open('vector.csv', 'a', newline='', encoding='utf-8') as csvfile:
