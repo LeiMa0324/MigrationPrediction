@@ -49,7 +49,7 @@ def getVectors():
     Vectors =[]
 
     # 获取用户acfun向量
-    with open('vector.csv', 'r', newline='', encoding='utf-8') as csvfile:
+    with open('vector_2_networks.csv', 'r', newline='', encoding='utf-8') as csvfile:
         csv_reader = csv.reader(csvfile)
         for row in csv_reader:
             # 去除向量长度小于4的数据
@@ -75,16 +75,20 @@ def getVectors():
 
 
 class User(object):
+
     aid =''
-    bid =''
+    bid=''
     states =[]
     vector =[]
     laststateindex = 0
+
     # 初始化
     def __init__(self,aid,bid,vector):
         self.aid = aid
         self.bid = bid
         self.vector = vector
+        self.states = []
+        self.laststateindex = 0
 
     def getstates(self):
         return self.states
@@ -92,7 +96,7 @@ class User(object):
     def writestates(self):
         content =[self.aid,self.bid]
         content.extend(self.states)
-        with open('states.csv', 'a', newline='', encoding='utf-8') as csvfile:
+        with open('states_2_networks.csv', 'a', newline='', encoding='utf-8') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(content)
 
@@ -163,14 +167,19 @@ class User(object):
                 break
 
 Vectors = getVectors()
-print(Vectors)
+
+Userlist =[]
 for vec in Vectors:
+
     user = User(vec[0],vec[1],vec[2:-1])
-    user.slidingwindow()
-    print(user.getids())
-    print(user.getvectors())
-    print(user.getstates())
-    user.writestates()
+    Userlist.append(user)
+
+for i in range(0,len(Userlist)):
+    Userlist[i].slidingwindow()
+    print(Userlist[i].getids())
+    print(Userlist[i].getvectors())
+    print(Userlist[i].getstates())
+    Userlist[i].writestates()
 
 
 

@@ -11,9 +11,9 @@ def getUserPairs():
     Userpairs=[]
     conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset="utf8")
     try:
-        conn.select_db("MigrationDetection02")
+        conn.select_db("MigrationDetection03")
         cur = conn.cursor()
-        sql ="SELECT a_id,b_id FROM MigrationDetection02.overlap_behav_vector group by a_id,b_id;"
+        sql ="SELECT a_id,b_id FROM overlap_behav_vector group by a_id,b_id;"
         cur.execute(sql)
         records = cur.fetchall()
         for r in records:
@@ -30,9 +30,9 @@ def getVideosForUser(userPair):
     conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset="utf8")
     VideoListForUser =[]
     try:
-        conn.select_db("MigrationDetection02")
+        conn.select_db("MigrationDetection03")
         cur = conn.cursor()
-        sql = "SELECT vid,abFlag,closeupdateFlag FROM MigrationDetection02.overlap_behav_vector where a_id =%s and b_id = %s;"
+        sql = "SELECT vid,abFlag,closeupdateFlag FROM overlap_behav_vector where a_id =%s and b_id = %s;"
         cur.execute(sql,userPair)
         records = cur.fetchall()
         for r in records:
@@ -50,9 +50,9 @@ def getSyntheticVideo(vid,abFlag):
     if abFlag =='A':
         conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset="utf8")
         try:
-            conn.select_db("MigrationDetection02")
+            conn.select_db("MigrationDetection03")
             cur = conn.cursor()
-            sql = "SELECT b_vid FROM MigrationDetection02.close_updates where a_vid = %s;"
+            sql = "SELECT b_vid FROM close_updates where a_vid = %s;"
             cur.execute(sql, vid)
             syntheticVid = cur.fetchone()[0]
         except Exception:
@@ -62,9 +62,9 @@ def getSyntheticVideo(vid,abFlag):
     else:
         conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset="utf8")
         try:
-            conn.select_db("MigrationDetection02")
+            conn.select_db("MigrationDetection03")
             cur = conn.cursor()
-            sql = "SELECT a_vid FROM MigrationDetection02.close_updates where b_vid = %s;"
+            sql = "SELECT a_vid FROM close_updates where b_vid = %s;"
             cur.execute(sql, vid)
             syntheticVid = cur.fetchone()[0]
         except Exception:
@@ -74,13 +74,13 @@ def getSyntheticVideo(vid,abFlag):
     reverseFlag = ('A' if abFlag=='B' else 'B')
     return [syntheticVid,reverseFlag]
 
-# 插入序列到数据库
+# 插入获取到的AB序列到数据库
 def insertVectors(Vec_element):
     conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset="utf8")
     try:
-        conn.select_db("MigrationDetection02")
+        conn.select_db("MigrationDetection03")
         cur = conn.cursor()
-        sql = "INSERT INTO `MigrationDetection02`.`overlap_vectors`(a_id,b_id,vec_element) values (%s,%s,%s);"
+        sql = "INSERT INTO overlap_vectors(a_id,b_id,vec_element) values (%s,%s,%s);"
         cur.executemany(sql, Vec_element)
         conn.commit()
         print('insert sucessed!')
@@ -136,58 +136,8 @@ def FlagSeriesExtraction(Userpairs):
         insertVectors(userVector)
         i+=1
 
+
 def vector():
-    UserPairs = getUserPairs()
-    # 对于每一对重叠用户
-    for pair in UserPairs:
-        Series =[]
-        acVector = []
-        acVector.extend(pair)
-        biliVector = []
-        biliVector.extend(pair)
-        conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset="utf8")
-        try:
-            conn.select_db("MigrationDetection02")
-            cur = conn.cursor()
-            sql = "SELECT vec_element FROM MigrationDetection02.overlap_vectors where a_id=%s and b_id=%s;"
-            cur.execute(sql,pair)
-            records = cur.fetchall()
-            for row in records:
-                Series.append(row[0])
-        except Exception as err:
-            print(err)
-            print(traceback.print_exc())
-        finally:
-            conn.close()
-
-        print(Series)
-        # 对每一个标记
-        for s in Series:
-            # 标签为‘A’，ac向量记1，bili记0
-            if s =='A':
-                acVector.append('1')
-                biliVector.append('0')
-            else:
-                # 标签为‘B’，ac向量记0，bili记1
-                if s=='B':
-                    acVector.append('0')
-                    biliVector.append('1')
-                    # 标签为'AB',同时记1
-                else:
-                    acVector.append('1')
-                    biliVector.append('1')
-
-
-        with open('acfun_vectors.csv', 'a', newline='', encoding='utf-8') as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow(acVector)
-
-        with open('bili_vectors.csv', 'a', newline='', encoding='utf-8') as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow(biliVector)
-
-
-def vector01():
     UserPairs = getUserPairs()
     # 对于每一对重叠用户
     for pair in UserPairs:
@@ -197,9 +147,9 @@ def vector01():
 
         conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset="utf8")
         try:
-            conn.select_db("MigrationDetection02")
+            conn.select_db("MigrationDetection03")
             cur = conn.cursor()
-            sql = "SELECT vec_element FROM MigrationDetection02.overlap_vectors where a_id=%s and b_id=%s;"
+            sql = "SELECT vec_element FROM overlap_vectors where a_id=%s and b_id=%s;"
             cur.execute(sql,pair)
             records = cur.fetchall()
             for row in records:
@@ -227,8 +177,12 @@ def vector01():
                     Vector.append([1,1])
 
 
-        with open('vector.csv', 'a', newline='', encoding='utf-8') as csvfile:
+        with open('vector_2_networks.csv', 'a', newline='', encoding='utf-8') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(Vector)
 
-vector01()
+
+# 获取用户组
+Userpairs = getUserPairs()
+FlagSeriesExtraction(Userpairs)
+vector()

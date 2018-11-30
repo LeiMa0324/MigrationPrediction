@@ -21,12 +21,12 @@ def lastUpdateOnAcfun():
     conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset="utf8")
     acIDS = ()
     try:
-        conn.select_db("MigrationDetection01")
+        conn.select_db("MigrationDetection03")
         cur = conn.cursor()
         # A站
         # sql = "SELECT a_id from overlap_user_final; "
         # B站
-        sql = "SELECT b_id from overlap_user_final; "
+        sql = "SELECT b_id from overlap_user_two_network; "
         cur.execute(sql)
         acIDS = cur.fetchall()
     except Exception:
@@ -47,12 +47,12 @@ def lastUpdateOnAcfun():
     conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset="utf8")
     lastupdateTime =[]
     try:
-        conn.select_db("MigrationDetection01")
+        conn.select_db("MigrationDetection03")
         cur = conn.cursor()
         # A站
         # sql = "SELECT uid,contributeTime FROM MigrationDetection01.overlap_acfun_videos where uid =%s order by contributeTime desc limit 1; "
         # B站
-        sql = "SELECT mid,created FROM MigrationDetection01.overlap_bili_videos where mid =%s order by created desc limit 1; "
+        sql = "SELECT mid,created FROM `overlap_bili_video_two_network` where mid =%s order by created desc limit 1; "
         for ac in acIDList:
             cur.execute(sql,ac)
             record = cur.fetchone()
@@ -66,10 +66,10 @@ def lastUpdateOnAcfun():
     # 更新到数据库
     conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset="utf8")
     # try:
-    conn.select_db("MigrationDetection01")
+    conn.select_db("MigrationDetection03")
     cur = conn.cursor()
     # B站
-    sql = "update overlap_user_final set b_lastupdate =%s where b_id = %s;"
+    sql = "update overlap_user_two_network set b_lastupdate =%s where b_id = %s;"
     for ac in lastupdateTime:
         cur.execute(sql,(ac[1],ac[0]))
     conn.commit()
@@ -86,9 +86,9 @@ def UpdateVector():
     userPairs =[]
     print('查找重叠用户对...')
     try:
-        conn.select_db("MigrationDetection01")
+        conn.select_db("MigrationDetection03")
         cur = conn.cursor()
-        userpairsql = 'SELECT a_id,b_id FROM MigrationDetection01.overlap_user_final;'
+        userpairsql = 'SELECT a_id,b_id FROM overlap_user_two_network;'
         cur.execute(userpairsql)
         records = cur.fetchall()
         for r in records:
@@ -106,14 +106,15 @@ def UpdateVector():
         userVideos =[]
         conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset="utf8")
         try:
-            conn.select_db("MigrationDetection01")
+            conn.select_db("MigrationDetection03")
             cur = conn.cursor()
-            videosql = 'SELECT a_id,b_id,vid,title,created,abFlag FROM MigrationDetection01.overlap_all_videos where a_id =%s and b_id =%s;'
+            videosql = 'SELECT a_id,b_id,vid,title,created,abFlag FROM overlap_all_videos_two_network where a_id =%s and b_id =%s;'
             cur.execute(videosql,(pair[0],pair[1]))
             videorecords = cur.fetchall()
             for r in videorecords:
                 userVideos.append(list(r))
             # 对视频按照上传时间排序
+            print(userVideos)
             sorteduserVideos = sorted(userVideos,key=lambda video:getTimeStamp(video[4]))
             allVideoList.extend(sorteduserVideos)
 
@@ -129,7 +130,7 @@ def UpdateVector():
     # 插入数据库
     conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset="utf8")
     try:
-        conn.select_db("MigrationDetection01")
+        conn.select_db("MigrationDetection03")
         cur = conn.cursor()
         insertsql = 'INSERT INTO sortedVideo(a_id,b_id,vid,title,created,abFlag) values(%s,%s,%s,%s,%s,%s);'
         cur.executemany(insertsql, allVideoList)
