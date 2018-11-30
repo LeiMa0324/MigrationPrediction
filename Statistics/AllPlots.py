@@ -7,6 +7,7 @@ from matplotlib import pyplot as plt
 from matplotlib.font_manager import FontProperties  # 步骤一
 import math
 import os
+import pandas as pd
 
 #正常显示中文
 # windows
@@ -21,20 +22,19 @@ plt.rcParams['axes.unicode_minus'] = False
 '''
 计算皮尔逊系数
 '''
-def PearsonCoeff(db):
-    conn = pymysql.connect(host="127.0.0.1",user="root",passwd="root",charset="utf8")
+def PearsonCoeff():
+    conn = pymysql.connect(host="223.3.76.172", user="root", passwd="123", charset="utf8")
     tuples=()
-    if db =="acfun":
-        sql="select playnum,bulletnum,commentnum,favoritenum from acfun_video where playnum >0;"
-    else:
-        sql = "select play,bullets,comment,favourites from bilibili_video_info where play >0;"
     '''
     计算B站皮尔逊系数
     '''
     try:
-        conn.select_db(db)
+        conn.select_db("MigrationDetection02")
         cur = conn.cursor()
-
+        # #二网重叠Acfun
+        sql ='SELECT playnum,bulletnum,commentnum,favoritenum FROM overlap_acfun_videos;'
+        # 二网重叠Bili
+        # sql = "SELECT play,bullets,comment,favourites FROM overlap_bili_videos;"
         cur.execute(sql)
         tuples = cur.fetchall()
     except Exception:
@@ -51,13 +51,18 @@ def PearsonCoeff(db):
         commentnum.append(t[2])
         favnum.append(t[3])
 
+
     dataarray= np.array((playnum,bulletnum,commentnum,favnum))
+    print(dataarray)
     #计算皮尔逊系数
     Pearson = np.corrcoef(dataarray)
 
-    print(db+"皮尔逊系数矩阵：")
+    print('#二网重叠Acfun')
+    # print("二网重叠用户-Bilibili皮尔逊系数矩阵：")
     print(Pearson)
 
+
+PearsonCoeff()
 
 '''
 第三章 图3.3播放量累计分布图
@@ -441,4 +446,3 @@ def TimeDiffHist():
     plt.show()
 
 
-TimeDiffHist()
